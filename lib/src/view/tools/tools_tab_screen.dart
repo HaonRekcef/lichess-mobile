@@ -8,6 +8,7 @@ import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/utils/navigation.dart';
 import 'package:lichess_mobile/src/view/account/profile_button.dart';
 import 'package:lichess_mobile/src/view/analysis/analysis_position_choice_screen.dart';
+import 'package:lichess_mobile/src/view/analysis/opening_explorer.dart';
 import 'package:lichess_mobile/src/view/clock/clock_screen.dart';
 import 'package:lichess_mobile/src/view/settings/settings_button.dart';
 import 'package:lichess_mobile/src/widgets/buttons.dart';
@@ -109,6 +110,25 @@ class _Body extends StatelessWidget {
           onTap: () => pushPlatformRoute(
             context,
             builder: (context) => const ClockScreen(),
+            rootNavigator: true,
+          ),
+        ),
+      ),
+      Padding(
+        padding: Styles.bodySectionBottomPadding,
+        child: CardButton(
+          icon: Icon(
+            Icons.alarm,
+            size: 44,
+            color: context.lichessColors.primary,
+          ),
+          title: Text(
+            context.l10n.openingExplorer,
+            style: Styles.callout,
+          ),
+          onTap: () => pushPlatformRoute(
+            context,
+            builder: (context) => ExplorerScreen(),
             rootNavigator: true,
           ),
         ),
