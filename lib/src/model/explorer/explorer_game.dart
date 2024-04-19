@@ -1,7 +1,7 @@
 class Game {
   final String? uci;
   final String id;
-  final String winner;
+  final String? winner;
   final String speed;
   final String mode;
   final Player black;

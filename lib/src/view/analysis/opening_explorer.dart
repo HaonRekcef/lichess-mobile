@@ -1,6 +1,11 @@
+import 'dart:math' as math;
+
+import 'package:chessground/chessground.dart' as cg;
+import 'package:dartchess/dartchess.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_controller.dart';
+import 'package:lichess_mobile/src/utils/chessground_compat.dart';
 
 class ExplorerScreen extends ConsumerWidget {
   @override
@@ -10,36 +15,58 @@ class ExplorerScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Chess Explorer'),
       ),
-      body: state.explorerResponse == null
-          ? const CircularProgressIndicator()
-          : Column(
-              children: [
-                Text('White: ${state.explorerResponse?.white}\n'
-                    'Draw: ${state.explorerResponse?.draw}\n'
-                    'Black: ${state.explorerResponse?.black}\n'
-                    'Opening: ${state.explorerResponse?.opening}\n'
-                    'Recent Games: ${state.explorerResponse?.recentGames}\n'
-                    'Top Games: ${state.explorerResponse?.topGames}'),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: state.explorerResponse?.moves.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final move = state.explorerResponse?.moves[index];
-                      return ListTile(
-                        title: Text('Move: ${move?.san}'),
-                        subtitle: Text('White: ${move?.white}\n'
-                            'Draw: ${move?.draws}\n'
-                            'Black: ${move?.black}'),
-                      );
-                    },
+      body: Column(
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final minDimension =
+                  math.min(constraints.maxWidth, constraints.maxHeight);
+              return Column(
+                children: [
+                  cg.Board(
+                    onMove: (move, {isDrop, isPremove}) => ref
+                        .read(explorerControllerProvider.notifier)
+                        .onUserMove(Move.fromUci(move.uci)!),
+                    size: minDimension,
+                    data: cg.BoardData(
+                      fen: state.position.fen,
+                      orientation: cg.Side.white,
+                      interactableSide: cg.InteractableSide.both,
+                      sideToMove: state.position.turn.cg,
+                      validMoves: state.validMoves,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              );
+            },
+          ),
+          if (state.explorerResponse == null)
+            const CircularProgressIndicator()
+          else
+            Text('White: ${state.explorerResponse?.white}\n'
+                'Draw: ${state.explorerResponse?.draw}\n'
+                'Black: ${state.explorerResponse?.black}\n'
+                'Opening: ${state.explorerResponse?.opening}\n'),
+          Expanded(
+            child: ListView.builder(
+              itemCount: state.explorerResponse?.moves.length ?? 0,
+              itemBuilder: (context, index) {
+                final move = state.explorerResponse?.moves[index];
+                return ListTile(
+                  title: Text('Move: ${move?.san}'),
+                  subtitle: Text('White: ${move?.white}\n'
+                      'Draw: ${move?.draws}\n'
+                      'Black: ${move?.black}'),
+                );
+              },
             ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => ref
             .read(explorerControllerProvider.notifier)
-            .fetchExplorer(fen: state.fen),
+            .fetchExplorer(fen: state.position.fen),
         child: const Icon(Icons.refresh),
       ),
     );

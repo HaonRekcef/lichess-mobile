@@ -48,7 +48,7 @@ Game _gameFromPick(Pick pick) {
   return Game(
     uci: pick('uci').asStringOrThrow(),
     id: pick('id').asStringOrThrow(),
-    winner: pick('winner').asStringOrThrow(),
+    winner: pick('winner').asStringOrNull(),
     speed: pick('speed').asStringOrThrow(),
     mode: pick('mode').asStringOrThrow(),
     black: _playerFromPick(pick('black').required()),
