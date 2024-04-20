@@ -13,6 +13,10 @@ part 'explorer_controller.g.dart';
 
 @riverpod
 class ExplorerController extends _$ExplorerController {
+  ExplorerController() {
+    Future.microtask(() => fetchExplorer(fen: state.position.fen));
+  }
+
   ExplorerRepository _repository(http.Client client) =>
       ExplorerRepository(client);
 
