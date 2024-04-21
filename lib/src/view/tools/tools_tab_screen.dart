@@ -101,7 +101,7 @@ class _Body extends StatelessWidget {
           icon: Icon(
             Icons.alarm,
             size: 44,
-            color: context.lichessColors.primary,
+            color: context.lichessColors.purple,
           ),
           title: Text(
             context.l10n.clock,
@@ -118,7 +118,7 @@ class _Body extends StatelessWidget {
         padding: Styles.bodySectionBottomPadding,
         child: CardButton(
           icon: Icon(
-            Icons.alarm,
+            Icons.explore,
             size: 44,
             color: context.lichessColors.primary,
           ),

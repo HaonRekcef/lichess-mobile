@@ -33,8 +33,8 @@ ExplorerResponse _decodeExplorerResponse(Map<String, dynamic> json) {
   );
 }
 
-Move _moveFromPick(RequiredPick pick) {
-  return Move(
+ExplorerMove _moveFromPick(RequiredPick pick) {
+  return ExplorerMove(
     uci: pick('uci').asStringOrThrow(),
     san: pick('san').asStringOrThrow(),
     averageRating: pick('averageRating').asIntOrThrow(),
@@ -44,8 +44,8 @@ Move _moveFromPick(RequiredPick pick) {
   );
 }
 
-Game _gameFromPick(Pick pick) {
-  return Game(
+ExplorerGame _gameFromPick(Pick pick) {
+  return ExplorerGame(
     uci: pick('uci').asStringOrThrow(),
     id: pick('id').asStringOrThrow(),
     winner: pick('winner').asStringOrNull(),
@@ -58,8 +58,8 @@ Game _gameFromPick(Pick pick) {
   );
 }
 
-Player _playerFromPick(RequiredPick pick) {
-  return Player(
+ExplorerPlayer _playerFromPick(RequiredPick pick) {
+  return ExplorerPlayer(
     name: pick('name').asStringOrThrow(),
     rating: pick('rating').asIntOrThrow(),
   );
@@ -71,9 +71,9 @@ class ExplorerResponse with _$ExplorerResponse {
     required int white,
     required int draw,
     required int black,
-    required IList<Move> moves,
-    required IList<Game> recentGames,
-    required IList<Game> topGames,
+    required IList<ExplorerMove> moves,
+    required IList<ExplorerGame> recentGames,
+    required IList<ExplorerGame> topGames,
     required String? opening,
   }) = _ExplorerResponse;
 }

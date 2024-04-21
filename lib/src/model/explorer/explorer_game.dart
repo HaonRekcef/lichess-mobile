@@ -1,15 +1,15 @@
-class Game {
+class ExplorerGame {
   final String? uci;
   final String id;
   final String? winner;
   final String speed;
   final String mode;
-  final Player black;
-  final Player white;
+  final ExplorerPlayer black;
+  final ExplorerPlayer white;
   final int year;
   final String month;
 
-  Game({
+  ExplorerGame({
     required this.uci,
     required this.id,
     required this.winner,
@@ -22,11 +22,11 @@ class Game {
   });
 }
 
-class Player {
+class ExplorerPlayer {
   final String name;
   final int rating;
 
-  Player({
+  ExplorerPlayer({
     required this.name,
     required this.rating,
   });

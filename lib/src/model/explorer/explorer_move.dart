@@ -1,4 +1,4 @@
-class Move {
+class ExplorerMove {
   final String uci;
   final String san;
   final int averageRating;
@@ -6,7 +6,7 @@ class Move {
   final int draws;
   final int black;
 
-  Move({
+  ExplorerMove({
     required this.uci,
     required this.san,
     required this.averageRating,
