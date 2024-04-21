@@ -118,9 +118,9 @@ class _Body extends StatelessWidget {
         padding: Styles.bodySectionBottomPadding,
         child: CardButton(
           icon: Icon(
-            Icons.explore,
+            Icons.alarm,
             size: 44,
-            color: context.lichessColors.purple,
+            color: context.lichessColors.primary,
           ),
           title: Text(
             context.l10n.openingExplorer,
