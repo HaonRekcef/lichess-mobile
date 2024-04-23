@@ -48,6 +48,10 @@ class ExplorerController extends _$ExplorerController {
       fetchExplorer(fen: position.fen);
     }
   }
+
+  void flipBoard() {
+    state = state.copyWith(pov: state.pov.opposite);
+  }
 }
 
 @freezed

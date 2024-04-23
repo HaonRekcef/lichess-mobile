@@ -6,6 +6,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lichess_mobile/src/constants.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_controller.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_game.dart';
@@ -17,6 +18,8 @@ import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/utils/navigation.dart';
 import 'package:lichess_mobile/src/utils/string.dart';
 import 'package:lichess_mobile/src/view/game/archived_game_screen.dart';
+import 'package:lichess_mobile/src/widgets/bottom_bar_button.dart';
+import 'package:lichess_mobile/src/widgets/buttons.dart';
 
 class ExplorerScreen extends ConsumerWidget {
   @override
@@ -47,7 +50,7 @@ class ExplorerScreen extends ConsumerWidget {
                     size: minDimension,
                     data: cg.BoardData(
                       fen: state.position.fen,
-                      orientation: cg.Side.white,
+                      orientation: state.pov.cg,
                       interactableSide: cg.InteractableSide.both,
                       sideToMove: state.position.turn.cg,
                       validMoves: state.validMoves,
@@ -66,166 +69,177 @@ class ExplorerScreen extends ConsumerWidget {
             },
           ),
           if (state.explorerResponse == null)
-            const CircularProgressIndicator()
+            const Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
           else
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Table(
-                      columnWidths: const <int, TableColumnWidth>{
-                        0: IntrinsicColumnWidth(),
-                        1: FlexColumnWidth(),
-                        2: FractionColumnWidth(0.5),
-                      },
-                      children: <TableRow>[
-                        TableRow(
-                          children: <Widget>[
-                            ColoredBox(
-                              color: color,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 5.0),
+                child: Material(
+                  child: Column(
+                    children: [
+                      Table(
+                        columnWidths: const <int, TableColumnWidth>{
+                          0: IntrinsicColumnWidth(),
+                          1: FlexColumnWidth(),
+                          2: FractionColumnWidth(0.5),
+                        },
+                        children: <TableRow>[
+                          TableRow(
+                            children: <Widget>[
+                              ColoredBox(
+                                color: color,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 5.0),
+                                  child: Text(
+                                    context.l10n.move,
+                                  ),
+                                ),
+                              ),
+                              ColoredBox(
+                                color: color,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  child: Text(
+                                    context.l10n.games,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ),
+                              ColoredBox(
+                                color: color,
                                 child: Text(
-                                  context.l10n.move,
+                                  context.l10n.whiteDrawBlack,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            ),
-                            ColoredBox(
-                              color: color,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 20.0),
-                                child: Text(
-                                  context.l10n.games,
-                                  textAlign: TextAlign.right,
-                                ),
-                              ),
-                            ),
-                            ColoredBox(
-                              color: color,
-                              child: Text(
-                                context.l10n.whiteDrawBlack,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                        ...List<TableRow>.generate(
-                          state.explorerResponse?.moves.length ?? 0,
-                          (index) {
-                            final move = state.explorerResponse?.moves[index];
-                            return TableRow(
-                              children: <Widget>[
-                                TableRowInkWell(
-                                  onTap: () {
-                                    _fetchExplorer(ref, move!.uci);
-                                  },
-                                  child: Ink(
-                                    color: index.isOdd
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .surfaceContainer
-                                        : Colors.transparent,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 5.0,
-                                      ),
-                                      child: Text(
-                                        '${move?.san}',
-                                        style: const TextStyle(
-                                          fontFamily: 'ChessFont',
+                            ],
+                          ),
+                          ...List<TableRow>.generate(
+                            state.explorerResponse?.moves.length ?? 0,
+                            (index) {
+                              final move = state.explorerResponse?.moves[index];
+                              return TableRow(
+                                children: <Widget>[
+                                  TableRowInkWell(
+                                    onTap: () {
+                                      _fetchExplorer(ref, move!.uci);
+                                    },
+                                    child: Ink(
+                                      color: index.isOdd
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surfaceContainer
+                                          : Colors.transparent,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 5.0,
+                                        ),
+                                        child: Text(
+                                          '${move?.san}',
+                                          style: const TextStyle(
+                                            fontFamily: 'ChessFont',
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                TableRowInkWell(
-                                  onTap: () {
-                                    _fetchExplorer(ref, move.uci);
-                                  },
-                                  child: Ink(
-                                    color: index.isOdd
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .surfaceContainer
-                                        : Colors.transparent,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(right: 20),
-                                      child: Text(
-                                        '${move!.white + move.draws + move.black}'
-                                            .localizeNumbers(),
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                TableRowInkWell(
-                                  onTap: () {
-                                    _fetchExplorer(ref, move.uci);
-                                  },
-                                  child: Ink(
-                                    color: index.isOdd
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .surfaceContainer
-                                        : Colors.transparent,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(right: 5),
-                                      child: ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                          //TODO find a way to not have this constant
-                                          maxHeight: 20,
-                                        ),
-                                        child: WinRateBar(
-                                          winRateWhite: move.white /
-                                              (move.white +
-                                                  move.draws +
-                                                  move.black),
-                                          drawRate: move.draws /
-                                              (move.white +
-                                                  move.draws +
-                                                  move.black),
+                                  TableRowInkWell(
+                                    onTap: () {
+                                      _fetchExplorer(ref, move.uci);
+                                    },
+                                    child: Ink(
+                                      color: index.isOdd
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surfaceContainer
+                                          : Colors.transparent,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 20),
+                                        child: Text(
+                                          '${move!.white + move.draws + move.black}'
+                                              .localizeNumbers(),
+                                          textAlign: TextAlign.right,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    ColoredBox(
-                      color: color,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          context.l10n.topGames,
-                        ),
+                                  TableRowInkWell(
+                                    onTap: () {
+                                      _fetchExplorer(ref, move.uci);
+                                    },
+                                    child: Ink(
+                                      color: index.isOdd
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .surfaceContainer
+                                          : Colors.transparent,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 5),
+                                        child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                            //TODO find a way to not have this constant
+                                            maxHeight: 20,
+                                          ),
+                                          child: WinRateBar(
+                                            winRateWhite: move.white /
+                                                (move.white +
+                                                    move.draws +
+                                                    move.black),
+                                            drawRate: move.draws /
+                                                (move.white +
+                                                    move.draws +
+                                                    move.black),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                    GameList(
-                      ref: ref,
-                      gameslist: state.explorerResponse?.topGames,
-                    ),
-                    ColoredBox(
-                      color: color,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          context.l10n.recentGames,
+                      if (state.explorerResponse!.topGames.isNotEmpty)
+                        ColoredBox(
+                          color: color,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              context.l10n.topGames,
+                            ),
+                          ),
                         ),
+                      GameList(
+                        ref: ref,
+                        gameslist: state.explorerResponse?.topGames,
                       ),
-                    ),
-                    GameList(
-                      ref: ref,
-                      gameslist: state.explorerResponse?.recentGames,
-                    ),
-                  ],
+                      if (state.explorerResponse!.recentGames.isNotEmpty)
+                        ColoredBox(
+                          color: color,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              context.l10n.recentGames,
+                            ),
+                          ),
+                        ),
+                      GameList(
+                        ref: ref,
+                        gameslist: state.explorerResponse?.recentGames,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
+          _BottomBar(),
         ],
       ),
     );
@@ -256,74 +270,76 @@ class GameList extends StatelessWidget {
           final game = gameslist?[index];
           final GameId id = GameId(game!.id);
 
-          return InkWell(
-            onTap: () {
-              ref
-                  .read(
-                archivedGameProvider(id: id).future,
-              )
-                  .then((game) {
-                pushPlatformRoute(
-                  context,
-                  builder: (context) => ArchivedGameScreen(
-                    gameData: game.data,
-                    orientation: Side.white,
-                  ),
-                );
-              });
-            },
-            child: Ink(
-              decoration: BoxDecoration(
-                color: index.isEven
-                    ? Colors.transparent
-                    : Theme.of(context).colorScheme.surfaceContainer,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${game.white.rating}   ${game.white.name}'),
-                      Text('${game.black.rating}   ${game.black.name}'),
-                    ],
-                  ),
-                  const Spacer(),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: ColoredBox(
-                      color: game.winner == 'black'
-                          ? const Color.fromARGB(255, 21, 21, 21)
-                          : game.winner == 'white'
-                              ? const Color.fromARGB(255, 230, 230, 230)
-                              : LichessColors.grey,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints.tightFor(width: 50),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                          ),
-                          child: Center(
-                            child: Text(
-                              game.winner == 'black'
-                                  ? '0-1'
-                                  : game.winner == 'white'
-                                      ? '1-0'
-                                      : '½-½',
-                              style: TextStyle(
-                                color: game.winner == 'white'
-                                    ? Colors.black
-                                    : Colors.white,
+          return Material(
+            child: InkWell(
+              onTap: () {
+                ref
+                    .read(
+                  archivedGameProvider(id: id).future,
+                )
+                    .then((game) {
+                  pushPlatformRoute(
+                    context,
+                    builder: (context) => ArchivedGameScreen(
+                      gameData: game.data,
+                      orientation: ref.read(explorerControllerProvider).pov,
+                    ),
+                  );
+                });
+              },
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: index.isEven
+                      ? Colors.transparent
+                      : Theme.of(context).colorScheme.surfaceContainer,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${game.white.rating}   ${game.white.name}'),
+                        Text('${game.black.rating}   ${game.black.name}'),
+                      ],
+                    ),
+                    const Spacer(),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: ColoredBox(
+                        color: game.winner == 'black'
+                            ? const Color.fromARGB(255, 21, 21, 21)
+                            : game.winner == 'white'
+                                ? const Color.fromARGB(255, 230, 230, 230)
+                                : LichessColors.grey,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints.tightFor(width: 50),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                            ),
+                            child: Center(
+                              child: Text(
+                                game.winner == 'black'
+                                    ? '0-1'
+                                    : game.winner == 'white'
+                                        ? '1-0'
+                                        : '½-½',
+                                style: TextStyle(
+                                  color: game.winner == 'white'
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(game.month),
-                ],
+                    const SizedBox(width: 10),
+                    Text(game.month),
+                  ],
+                ),
               ),
             ),
           );
@@ -406,6 +422,59 @@ class WinRateBar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _BottomBar extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      color: (Theme.of(context).platform == TargetPlatform.iOS
+          ? CupertinoTheme.of(context).barBackgroundColor
+          : Theme.of(context).bottomAppBarTheme.color),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: kBottomBarHeight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: BottomBarButton(
+                  label: context.l10n.flipBoard,
+                  onTap: () {
+                    ref.read(explorerControllerProvider.notifier).flipBoard();
+                  },
+                  icon: CupertinoIcons.arrow_2_squarepath,
+                ),
+              ),
+              Expanded(
+                child: RepeatButton(
+                  onLongPress: () {},
+                  child: BottomBarButton(
+                    onTap: () {},
+                    label: 'Previous',
+                    icon: CupertinoIcons.chevron_back,
+                    showTooltip: false,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: RepeatButton(
+                  onLongPress: () {},
+                  child: BottomBarButton(
+                    onTap: () {},
+                    label: context.l10n.next,
+                    icon: CupertinoIcons.chevron_forward,
+                    showTooltip: false,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
