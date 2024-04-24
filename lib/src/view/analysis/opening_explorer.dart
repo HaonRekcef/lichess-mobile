@@ -54,6 +54,7 @@ class ExplorerScreen extends ConsumerWidget {
                       interactableSide: cg.InteractableSide.both,
                       sideToMove: state.currentNode.position.turn.cg,
                       validMoves: state.validMoves,
+                      lastMove: state.lastMove?.cg,
                     ),
                     settings: cg.BoardSettings(
                       pieceAssets: boardPrefs.pieceSet.assets,

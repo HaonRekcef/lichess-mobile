@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart' as http;
 import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/common/node.dart';
+import 'package:lichess_mobile/src/model/common/service/sound_service.dart';
 import 'package:lichess_mobile/src/model/common/uci.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -78,7 +79,18 @@ class ExplorerController extends _$ExplorerController {
   }
 
   void _setPath(UciPath path) {
-    state = state.copyWith(path: path, currentNode: state.root.nodeAt(path));
+    final newNode = state.root.nodeAt(path);
+    final sanMove = newNode.view.sanMove;
+    if (sanMove?.isCapture == true) {
+      ref.read(soundServiceProvider).play(Sound.capture);
+    } else {
+      ref.read(soundServiceProvider).play(Sound.move);
+    }
+    state = state.copyWith(
+      path: path,
+      currentNode: state.root.nodeAt(path),
+      lastMove: sanMove?.move,
+    );
   }
 }
 
@@ -91,6 +103,7 @@ class ExplorerState with _$ExplorerState {
     required Side pov,
     required Root root,
     required Node currentNode,
+    Move? lastMove,
     ExplorerResponse? explorerResponse,
   }) = _ExplorerState;
   IMap<String, ISet<String>> get validMoves =>
