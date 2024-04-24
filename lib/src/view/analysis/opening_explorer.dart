@@ -49,10 +49,10 @@ class ExplorerScreen extends ConsumerWidget {
                         _fetchExplorer(ref, move.uci),
                     size: minDimension,
                     data: cg.BoardData(
-                      fen: state.position.fen,
+                      fen: state.currentNode.position.fen,
                       orientation: state.pov.cg,
                       interactableSide: cg.InteractableSide.both,
-                      sideToMove: state.position.turn.cg,
+                      sideToMove: state.currentNode.position.turn.cg,
                       validMoves: state.validMoves,
                     ),
                     settings: cg.BoardSettings(
@@ -451,9 +451,17 @@ class _BottomBar extends ConsumerWidget {
               ),
               Expanded(
                 child: RepeatButton(
-                  onLongPress: () {},
+                  onLongPress: ref
+                          .read(explorerControllerProvider.notifier)
+                          .canGoBackward()
+                      ? () => _moveBackward(ref)
+                      : null,
                   child: BottomBarButton(
-                    onTap: () {},
+                    onTap: ref
+                            .read(explorerControllerProvider.notifier)
+                            .canGoBackward()
+                        ? () => _moveBackward(ref)
+                        : null,
                     label: 'Previous',
                     icon: CupertinoIcons.chevron_back,
                     showTooltip: false,
@@ -462,9 +470,17 @@ class _BottomBar extends ConsumerWidget {
               ),
               Expanded(
                 child: RepeatButton(
-                  onLongPress: () {},
+                  onLongPress: ref
+                          .read(explorerControllerProvider.notifier)
+                          .canGoForward()
+                      ? () => _moveForward(ref)
+                      : null,
                   child: BottomBarButton(
-                    onTap: () {},
+                    onTap: ref
+                            .read(explorerControllerProvider.notifier)
+                            .canGoForward()
+                        ? () => _moveForward(ref)
+                        : null,
                     label: context.l10n.next,
                     icon: CupertinoIcons.chevron_forward,
                     showTooltip: false,
@@ -476,5 +492,13 @@ class _BottomBar extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _moveBackward(WidgetRef ref) {
+    ref.read(explorerControllerProvider.notifier).goToPreviousNode();
+  }
+
+  void _moveForward(WidgetRef ref) {
+    ref.read(explorerControllerProvider.notifier).goToNextNode();
   }
 }
