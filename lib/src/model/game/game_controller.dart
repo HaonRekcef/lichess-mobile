@@ -206,7 +206,12 @@ class GameController extends _$GameController {
 
   void cursorAt(int cursor) {
     if (state.hasValue) {
-      state = AsyncValue.data(state.requireValue.copyWith(stepCursor: cursor));
+      state = AsyncValue.data(
+        state.requireValue.copyWith(
+          stepCursor: cursor,
+          premove: null,
+        ),
+      );
       final san = state.requireValue.game.stepAt(cursor).sanMove?.san;
       if (san != null) {
         _playReplayMoveSound(san);
@@ -220,7 +225,7 @@ class GameController extends _$GameController {
       final curState = state.requireValue;
       if (curState.stepCursor < curState.game.steps.length - 1) {
         state = AsyncValue.data(
-          curState.copyWith(stepCursor: curState.stepCursor + 1),
+          curState.copyWith(stepCursor: curState.stepCursor + 1, premove: null),
         );
         final san = curState.game.stepAt(curState.stepCursor + 1).sanMove?.san;
         if (san != null) {
@@ -235,7 +240,7 @@ class GameController extends _$GameController {
       final curState = state.requireValue;
       if (curState.stepCursor > 0) {
         state = AsyncValue.data(
-          curState.copyWith(stepCursor: curState.stepCursor - 1),
+          curState.copyWith(stepCursor: curState.stepCursor - 1, premove: null),
         );
         final san = curState.game.stepAt(curState.stepCursor - 1).sanMove?.san;
         if (san != null) {
@@ -990,10 +995,11 @@ class GameState with _$GameState {
     return null;
   }
 
+  String get analysisPgn => game.makePgn();
+
   AnalysisOptions get analysisOptions => AnalysisOptions(
         isLocalEvaluationAllowed: true,
         variant: game.meta.variant,
-        pgn: game.makePgn(),
         initialMoveCursor: stepCursor,
         orientation: game.youAre ?? Side.white,
         id: gameFullId,

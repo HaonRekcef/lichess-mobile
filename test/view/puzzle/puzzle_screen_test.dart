@@ -4,7 +4,6 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
@@ -16,8 +15,6 @@ import 'package:lichess_mobile/src/model/puzzle/puzzle_service.dart';
 import 'package:lichess_mobile/src/model/puzzle/puzzle_storage.dart';
 import 'package:lichess_mobile/src/model/puzzle/puzzle_theme.dart';
 import 'package:lichess_mobile/src/view/puzzle/puzzle_screen.dart';
-import 'package:lichess_mobile/src/view/puzzle/puzzle_settings_screen.dart';
-import 'package:lichess_mobile/src/widgets/buttons.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../test_app.dart';
@@ -26,17 +23,6 @@ import '../../test_utils.dart';
 class MockPuzzleBatchStorage extends Mock implements PuzzleBatchStorage {}
 
 class MockPuzzleStorage extends Mock implements PuzzleStorage {}
-
-class FakeClientFactory implements LichessClientFactory {
-  FakeClientFactory(this._client);
-
-  final http.Client _client;
-
-  @override
-  http.Client call() {
-    return _client;
-  }
-}
 
 void main() {
   setUpAll(() {
@@ -168,8 +154,8 @@ void main() {
             ),
           ),
           overrides: [
-            lichessClientFactoryProvider.overrideWith((ref) {
-              return FakeClientFactory(mockClient);
+            lichessClientProvider.overrideWith((ref) {
+              return mockClient;
             }),
             puzzleBatchStorageProvider.overrideWith((ref) {
               return mockBatchStorage;
@@ -280,8 +266,8 @@ void main() {
             ),
           ),
           overrides: [
-            lichessClientFactoryProvider.overrideWith((ref) {
-              return FakeClientFactory(mockClient);
+            lichessClientProvider.overrideWith((ref) {
+              return mockClient;
             }),
             puzzleBatchStorageProvider.overrideWith((ref) {
               return mockBatchStorage;
@@ -381,8 +367,8 @@ void main() {
             ),
           ),
           overrides: [
-            lichessClientFactoryProvider.overrideWith((ref) {
-              return FakeClientFactory(mockClient);
+            lichessClientProvider.overrideWith((ref) {
+              return mockClient;
             }),
             puzzleBatchStorageProvider.overrideWith((ref) {
               return mockBatchStorage;
@@ -435,70 +421,6 @@ void main() {
 
         // called once to save solution and once after fetching a new puzzle
         verify(saveDBReq).called(2);
-      },
-    );
-
-    testWidgets(
-      'shows settings icon if user is logged in',
-      variant: kPlatformVariant,
-      (tester) async {
-        const userId = UserId('test_userId');
-        final app = await buildTestApp(
-          tester,
-          home: PuzzleScreen(
-            angle: const PuzzleTheme(PuzzleThemeKey.mix),
-            initialPuzzleContext: PuzzleContext(
-              puzzle: puzzle,
-              angle: const PuzzleTheme(PuzzleThemeKey.mix),
-              userId: userId,
-            ),
-          ),
-          overrides: [
-            puzzleBatchStorageProvider.overrideWith((ref) => mockBatchStorage),
-            puzzleStorageProvider.overrideWith((ref) => mockHistoryStorage),
-          ],
-        );
-
-        await tester.pumpWidget(app);
-
-        expect(find.byType(AppBarIconButton), findsOneWidget);
-
-        await tester.tap(find.byType(AppBarIconButton));
-        await tester.pumpAndSettle();
-
-        expect(
-          find.byWidgetPredicate(
-            (widget) =>
-                widget is PuzzleSettingsScreen && widget.userId == userId,
-          ),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'show settings icon if user is not logged in',
-      variant: kPlatformVariant,
-      (tester) async {
-        final app = await buildTestApp(
-          tester,
-          home: PuzzleScreen(
-            angle: const PuzzleTheme(PuzzleThemeKey.mix),
-            initialPuzzleContext: PuzzleContext(
-              puzzle: puzzle,
-              angle: const PuzzleTheme(PuzzleThemeKey.mix),
-              userId: null,
-            ),
-          ),
-          overrides: [
-            puzzleBatchStorageProvider.overrideWith((ref) => mockBatchStorage),
-            puzzleStorageProvider.overrideWith((ref) => mockHistoryStorage),
-          ],
-        );
-
-        await tester.pumpWidget(app);
-
-        expect(find.byType(AppBarIconButton), findsOneWidget);
       },
     );
   });

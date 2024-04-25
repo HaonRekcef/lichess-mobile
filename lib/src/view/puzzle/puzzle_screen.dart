@@ -8,6 +8,7 @@ import 'package:lichess_mobile/src/constants.dart';
 import 'package:lichess_mobile/src/model/analysis/analysis_controller.dart';
 import 'package:lichess_mobile/src/model/auth/auth_session.dart';
 import 'package:lichess_mobile/src/model/common/chess.dart';
+import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
 import 'package:lichess_mobile/src/model/engine/evaluation_service.dart';
 import 'package:lichess_mobile/src/model/game/game_repository_providers.dart';
@@ -34,6 +35,7 @@ import 'package:lichess_mobile/src/view/game/archived_game_screen.dart';
 import 'package:lichess_mobile/src/view/puzzle/puzzle_settings_screen.dart';
 import 'package:lichess_mobile/src/view/settings/toggle_sound_button.dart';
 import 'package:lichess_mobile/src/widgets/adaptive_action_sheet.dart';
+import 'package:lichess_mobile/src/widgets/adaptive_bottom_sheet.dart';
 import 'package:lichess_mobile/src/widgets/adaptive_choice_picker.dart';
 import 'package:lichess_mobile/src/widgets/board_table.dart';
 import 'package:lichess_mobile/src/widgets/bottom_bar_button.dart';
@@ -549,7 +551,8 @@ class _BottomBar extends ConsumerWidget {
           onPressed: (context) {
             launchShareDialog(
               context,
-              text: '$kLichessHost/training/${puzzleState.puzzle.puzzle.id}',
+              text: lichessUri('/training/${puzzleState.puzzle.puzzle.id}')
+                  .toString(),
             );
           },
         ),
@@ -560,10 +563,10 @@ class _BottomBar extends ConsumerWidget {
               context,
               builder: (context) => AnalysisScreen(
                 title: context.l10n.analysis,
+                pgnOrId: ref.read(ctrlProvider.notifier).makePgn(),
                 options: AnalysisOptions(
                   isLocalEvaluationAllowed: true,
                   variant: Variant.standard,
-                  pgn: ref.read(ctrlProvider.notifier).makePgn(),
                   orientation: puzzleState.pov,
                   id: standaloneAnalysisId,
                   initialMoveCursor: 0,
@@ -681,10 +684,11 @@ class _PuzzleSettingsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBarIconButton(
-      onPressed: () => pushPlatformRoute(
-        context,
-        title: context.l10n.settingsSettings,
-        fullscreenDialog: true,
+      onPressed: () => showAdaptiveBottomSheet<void>(
+        context: context,
+        isDismissible: true,
+        isScrollControlled: true,
+        showDragHandle: true,
         builder: (_) => PuzzleSettingsScreen(userId: userId),
       ),
       semanticsLabel: context.l10n.settingsSettings,

@@ -7,6 +7,7 @@ import 'package:lichess_mobile/src/constants.dart';
 import 'package:lichess_mobile/src/model/analysis/analysis_controller.dart';
 import 'package:lichess_mobile/src/model/auth/auth_session.dart';
 import 'package:lichess_mobile/src/model/common/chess.dart';
+import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/puzzle/puzzle_angle.dart';
 import 'package:lichess_mobile/src/model/puzzle/puzzle_controller.dart';
 import 'package:lichess_mobile/src/model/puzzle/puzzle_providers.dart';
@@ -302,8 +303,9 @@ class _BottomBar extends ConsumerWidget {
                     onTap: () {
                       launchShareDialog(
                         context,
-                        text:
-                            '$kLichessHost/training/${puzzleState.puzzle.puzzle.id}',
+                        text: lichessUri(
+                          '/training/${puzzleState.puzzle.puzzle.id}',
+                        ).toString(),
                       );
                     },
                     label: 'Share this puzzle',
@@ -320,10 +322,10 @@ class _BottomBar extends ConsumerWidget {
                         context,
                         builder: (context) => AnalysisScreen(
                           title: context.l10n.analysis,
+                          pgnOrId: ref.read(ctrlProvider.notifier).makePgn(),
                           options: AnalysisOptions(
                             isLocalEvaluationAllowed: true,
                             variant: Variant.standard,
-                            pgn: ref.read(ctrlProvider.notifier).makePgn(),
                             orientation: puzzleState.pov,
                             id: standaloneAnalysisId,
                             initialMoveCursor: 0,
