@@ -35,10 +35,9 @@ class ExplorerController extends _$ExplorerController {
 
   Future<void> fetchExplorer({required String fen}) async {
     state = state.copyWith(explorerResponse: null);
-    final response = await ref.withClient(
-      (client) => _repository(client).getExplorer(
-        fen,
-      ),
+    final client = ref.read(defaultClientProvider);
+    final response = await _repository(client).getExplorer(
+      fen,
     );
 
     state = state.copyWith(explorerResponse: response);

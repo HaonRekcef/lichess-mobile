@@ -14,6 +14,7 @@ class ExplorerRepository {
   final http.Client client;
 
   Future<ExplorerResponse> getExplorer(String fen) {
+    print('requesting https://explorer.lichess.ovh/lichess?fen=$fen');
     return client.readJson(
       Uri.parse('https://explorer.lichess.ovh/lichess?fen=$fen'),
       mapper: _decodeExplorerResponse,
