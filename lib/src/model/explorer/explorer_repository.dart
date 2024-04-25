@@ -2,6 +2,7 @@ import 'package:deep_pick/deep_pick.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:lichess_mobile/src/model/common/chess.dart';
 import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_game.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_move.dart';
@@ -23,6 +24,11 @@ class ExplorerRepository {
 }
 
 ExplorerResponse _decodeExplorerResponse(Map<String, dynamic> json) {
+  LightOpening? opening;
+  final openingMap = pick(json['opening']).asMapOrNull<String, dynamic>();
+  if (openingMap != null) {
+    opening = LightOpening.fromJson(openingMap);
+  }
   return ExplorerResponse(
     white: pick(json['white']).asIntOrThrow(),
     draw: pick(json['draws']).asIntOrThrow(),
@@ -30,7 +36,7 @@ ExplorerResponse _decodeExplorerResponse(Map<String, dynamic> json) {
     moves: IList(pick(json['moves']).asListOrThrow(_moveFromPick)),
     topGames: IList(pick(json['topGames']).asListOrThrow(_gameFromPick)),
     recentGames: IList(pick(json['recentGames']).asListOrThrow(_gameFromPick)),
-    opening: pick(json['opening']).asStringOrNull(),
+    opening: opening,
   );
 }
 
@@ -75,6 +81,6 @@ class ExplorerResponse with _$ExplorerResponse {
     required IList<ExplorerMove> moves,
     required IList<ExplorerGame> recentGames,
     required IList<ExplorerGame> topGames,
-    required String? opening,
+    required LightOpening? opening,
   }) = _ExplorerResponse;
 }

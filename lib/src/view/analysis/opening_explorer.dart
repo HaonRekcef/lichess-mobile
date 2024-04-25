@@ -82,6 +82,21 @@ class ExplorerScreen extends ConsumerWidget {
                 child: Material(
                   child: Column(
                     children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ColoredBox(
+                              color: color,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 5.0),
+                                child: Text(
+                                  '${state.opening?.eco ?? ''} ${state.opening?.name ?? ''}',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       Table(
                         columnWidths: const <int, TableColumnWidth>{
                           0: IntrinsicColumnWidth(),

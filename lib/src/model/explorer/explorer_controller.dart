@@ -3,6 +3,7 @@ import 'package:dartchess/dartchess.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:lichess_mobile/src/model/common/chess.dart';
 import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/common/node.dart';
 import 'package:lichess_mobile/src/model/common/service/sound_service.dart';
@@ -39,8 +40,12 @@ class ExplorerController extends _$ExplorerController {
     final response = await _repository(client).getExplorer(
       fen,
     );
-
-    state = state.copyWith(explorerResponse: response);
+    if (response.opening != null) {
+      final opening = response.opening;
+      state = state.copyWith(explorerResponse: response, opening: opening);
+    } else {
+      state = state.copyWith(explorerResponse: response);
+    }
   }
 
   void onUserMove(Move move) {
@@ -102,6 +107,7 @@ class ExplorerState with _$ExplorerState {
     required Side pov,
     required Root root,
     required Node currentNode,
+    LightOpening? opening,
     Move? lastMove,
     ExplorerResponse? explorerResponse,
   }) = _ExplorerState;
