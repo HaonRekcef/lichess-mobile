@@ -14,10 +14,11 @@ class ExplorerRepository {
 
   final http.Client client;
 
-  Future<ExplorerResponse> getExplorer(String fen) {
+  Future<ExplorerResponse> getExplorer(String fen, List<int> selectedRatings) {
     print('requesting https://explorer.lichess.ovh/lichess?fen=$fen');
     return client.readJson(
-      Uri.parse('https://explorer.lichess.ovh/lichess?fen=$fen'),
+      Uri.parse(
+          'https://explorer.lichess.ovh/lichess?fen=$fen&ratings=${selectedRatings.join(',')}'),
       mapper: _decodeExplorerResponse,
     );
   }

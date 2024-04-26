@@ -8,6 +8,7 @@ import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/common/node.dart';
 import 'package:lichess_mobile/src/model/common/service/sound_service.dart';
 import 'package:lichess_mobile/src/model/common/uci.dart';
+import 'package:lichess_mobile/src/model/explorer/explorer_preferences.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -37,9 +38,10 @@ class ExplorerController extends _$ExplorerController {
   Future<void> fetchExplorer({required String fen}) async {
     state = state.copyWith(explorerResponse: null);
     final client = ref.read(defaultClientProvider);
-    final response = await _repository(client).getExplorer(
-      fen,
-    );
+    final explorerPreferences = ref.read(explorerPreferencesProvider);
+    final selectedRatings = explorerPreferences.selectedRatings;
+    final response =
+        await _repository(client).getExplorer(fen, selectedRatings);
     if (response.opening != null) {
       final opening = response.opening;
       state = state.copyWith(explorerResponse: response, opening: opening);

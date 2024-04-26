@@ -17,7 +17,9 @@ import 'package:lichess_mobile/src/utils/chessground_compat.dart';
 import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/utils/navigation.dart';
 import 'package:lichess_mobile/src/utils/string.dart';
+import 'package:lichess_mobile/src/view/explorer/explorer_settings_screen.dart';
 import 'package:lichess_mobile/src/view/game/archived_game_screen.dart';
+import 'package:lichess_mobile/src/widgets/adaptive_bottom_sheet.dart';
 import 'package:lichess_mobile/src/widgets/bottom_bar_button.dart';
 import 'package:lichess_mobile/src/widgets/buttons.dart';
 
@@ -35,6 +37,9 @@ class ExplorerScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.openingExplorer),
+        actions: [
+          _ExplorerSettings(),
+        ],
       ),
       body: Column(
         children: [
@@ -105,32 +110,26 @@ class ExplorerScreen extends ConsumerWidget {
                         },
                         children: <TableRow>[
                           TableRow(
+                            decoration: BoxDecoration(
+                              color: color,
+                            ),
                             children: <Widget>[
-                              ColoredBox(
-                                color: color,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 5.0),
-                                  child: Text(
-                                    context.l10n.move,
-                                  ),
-                                ),
-                              ),
-                              ColoredBox(
-                                color: color,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 20.0),
-                                  child: Text(
-                                    context.l10n.games,
-                                    textAlign: TextAlign.right,
-                                  ),
-                                ),
-                              ),
-                              ColoredBox(
-                                color: color,
+                              Padding(
+                                padding: const EdgeInsets.only(left: 5.0),
                                 child: Text(
-                                  context.l10n.whiteDrawBlack,
-                                  textAlign: TextAlign.center,
+                                  context.l10n.move,
                                 ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 20.0),
+                                child: Text(
+                                  context.l10n.games,
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                              Text(
+                                context.l10n.whiteDrawBlack,
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -516,5 +515,22 @@ class _BottomBar extends ConsumerWidget {
 
   void _moveForward(WidgetRef ref) {
     ref.read(explorerControllerProvider.notifier).goToNextNode();
+  }
+}
+
+class _ExplorerSettings extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AppBarIconButton(
+      icon: const Icon(Icons.settings),
+      onPressed: () => showAdaptiveBottomSheet<void>(
+        context: context,
+        isDismissible: true,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => const ExplorerSettingsScreen(),
+      ),
+      semanticsLabel: context.l10n.settingsSettings,
+    );
   }
 }
