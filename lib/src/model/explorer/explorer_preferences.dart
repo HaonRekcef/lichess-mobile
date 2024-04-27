@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:lichess_mobile/src/db/shared_preferences.dart';
+import 'package:lichess_mobile/src/model/explorer/explorer_game_speed.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'explorer_preferences.freezed.dart';
@@ -26,12 +27,20 @@ class ExplorerPreferences extends _$ExplorerPreferences {
     await prefs.setString(_prefKey, jsonEncode(newState.toJson()));
     state = newState;
   }
+
+  Future<void> saveSelectedSpeeds(List<GameSpeed> selectedSpeeds) async {
+    final newState = state.copyWith(selectedSpeeds: selectedSpeeds);
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString(_prefKey, jsonEncode(newState.toJson()));
+    state = newState;
+  }
 }
 
 @Freezed(fromJson: true, toJson: true)
 class ExplorerPrefState with _$ExplorerPrefState {
   const factory ExplorerPrefState({
     required List<int> selectedRatings,
+    required List<GameSpeed> selectedSpeeds,
     required bool test,
   }) = _ExplorerPrefState;
 
@@ -46,6 +55,14 @@ class ExplorerPrefState with _$ExplorerPrefState {
           2000,
           2200,
           2500,
+        ],
+        selectedSpeeds: [
+          GameSpeed.ultraBullet,
+          GameSpeed.bullet,
+          GameSpeed.blitz,
+          GameSpeed.rapid,
+          GameSpeed.classical,
+          GameSpeed.correspondence,
         ],
         test: false,
       );

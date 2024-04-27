@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:lichess_mobile/src/model/common/chess.dart';
 import 'package:lichess_mobile/src/model/common/http.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_game.dart';
+import 'package:lichess_mobile/src/model/explorer/explorer_game_speed.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_move.dart';
 
 part 'explorer_repository.freezed.dart';
@@ -14,11 +15,20 @@ class ExplorerRepository {
 
   final http.Client client;
 
-  Future<ExplorerResponse> getExplorer(String fen, List<int> selectedRatings) {
-    print('requesting https://explorer.lichess.ovh/lichess?fen=$fen');
+  Future<ExplorerResponse> getExplorer(
+    String fen,
+    List<int> selectedRatings,
+    List<GameSpeed> selectedSpeeds,
+  ) {
+    final selectedSpeedStrings =
+        selectedSpeeds.map((speed) => speed.name).toList();
+    print(
+      'requesting https://explorer.lichess.ovh/lichess?fen=$fen&ratings=${selectedRatings.join(',')}&speeds=${selectedSpeedStrings.join(',')}',
+    );
     return client.readJson(
       Uri.parse(
-          'https://explorer.lichess.ovh/lichess?fen=$fen&ratings=${selectedRatings.join(',')}'),
+        'https://explorer.lichess.ovh/lichess?fen=$fen&ratings=${selectedRatings.join(',')}&speeds=${selectedSpeedStrings.join(',')}',
+      ),
       mapper: _decodeExplorerResponse,
     );
   }

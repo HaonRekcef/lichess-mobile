@@ -40,8 +40,9 @@ class ExplorerController extends _$ExplorerController {
     final client = ref.read(defaultClientProvider);
     final explorerPreferences = ref.read(explorerPreferencesProvider);
     final selectedRatings = explorerPreferences.selectedRatings;
-    final response =
-        await _repository(client).getExplorer(fen, selectedRatings);
+    final selectedSpeeds = explorerPreferences.selectedSpeeds;
+    final response = await _repository(client)
+        .getExplorer(fen, selectedRatings, selectedSpeeds);
     if (response.opening != null) {
       final opening = response.opening;
       state = state.copyWith(explorerResponse: response, opening: opening);
