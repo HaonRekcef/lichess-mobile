@@ -47,15 +47,16 @@ import 'puzzle_feedback_widget.dart';
 import 'puzzle_session_widget.dart';
 
 class PuzzleScreen extends ConsumerStatefulWidget {
+  /// Creates a new puzzle screen.
+  ///
+  /// If [puzzleId] is provided, the screen will load the puzzle with that id. Otherwise, it will load the next puzzle from the queue.
   const PuzzleScreen({
     required this.angle,
-    this.initialPuzzleContext,
     this.puzzleId,
     super.key,
   });
 
   final PuzzleAngle angle;
-  final PuzzleContext? initialPuzzleContext;
   final PuzzleId? puzzleId;
 
   @override
@@ -98,48 +99,38 @@ class _PuzzleScreenState extends ConsumerState<PuzzleScreen> with RouteAware {
   }
 
   Widget _androidBuilder(BuildContext context) {
-    final userId = widget.initialPuzzleContext?.userId;
-
     return Scaffold(
       appBar: AppBar(
         actions: [
           ToggleSoundButton(),
-          _PuzzleSettingsButton(userId: userId),
+          const _PuzzleSettingsButton(),
         ],
         title: _Title(angle: widget.angle),
       ),
-      body: widget.initialPuzzleContext != null
-          ? _Body(
-              initialPuzzleContext: widget.initialPuzzleContext!,
-            )
-          : widget.puzzleId != null
-              ? _LoadPuzzleFromId(angle: widget.angle, id: widget.puzzleId!)
-              : _LoadNextPuzzle(angle: widget.angle),
+      body: widget.puzzleId != null
+          ? _LoadPuzzleFromId(angle: widget.angle, id: widget.puzzleId!)
+          : _LoadNextPuzzle(angle: widget.angle),
     );
   }
 
   Widget _iosBuilder(BuildContext context) {
-    final userId = widget.initialPuzzleContext?.userId;
-
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: Styles.cupertinoScaffoldColor.resolveFrom(context),
+        border: null,
         padding: Styles.cupertinoAppBarTrailingWidgetPadding,
         middle: _Title(angle: widget.angle),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             ToggleSoundButton(),
-            _PuzzleSettingsButton(userId: userId),
+            const _PuzzleSettingsButton(),
           ],
         ),
       ),
-      child: widget.initialPuzzleContext != null
-          ? _Body(
-              initialPuzzleContext: widget.initialPuzzleContext!,
-            )
-          : widget.puzzleId != null
-              ? _LoadPuzzleFromId(angle: widget.angle, id: widget.puzzleId!)
-              : _LoadNextPuzzle(angle: widget.angle),
+      child: widget.puzzleId != null
+          ? _LoadPuzzleFromId(angle: widget.angle, id: widget.puzzleId!)
+          : _LoadNextPuzzle(angle: widget.angle),
     );
   }
 }
@@ -442,7 +433,7 @@ class _BottomBar extends ConsumerWidget {
 
     return Container(
       color: Theme.of(context).platform == TargetPlatform.iOS
-          ? CupertinoTheme.of(context).barBackgroundColor
+          ? null
           : Theme.of(context).bottomAppBarTheme.color,
       child: SafeArea(
         top: false,
@@ -677,9 +668,7 @@ class _DifficultySelector extends ConsumerWidget {
 }
 
 class _PuzzleSettingsButton extends StatelessWidget {
-  const _PuzzleSettingsButton({required this.userId});
-
-  final UserId? userId;
+  const _PuzzleSettingsButton();
 
   @override
   Widget build(BuildContext context) {
@@ -689,7 +678,7 @@ class _PuzzleSettingsButton extends StatelessWidget {
         isDismissible: true,
         isScrollControlled: true,
         showDragHandle: true,
-        builder: (_) => PuzzleSettingsScreen(userId: userId),
+        builder: (_) => const PuzzleSettingsScreen(),
       ),
       semanticsLabel: context.l10n.settingsSettings,
       icon: const Icon(Icons.settings),
