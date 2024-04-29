@@ -2,8 +2,7 @@ class ExplorerGame {
   final String? uci;
   final String id;
   final String? winner;
-  final String speed;
-  final String mode;
+  final String? speed;
   final ExplorerPlayer black;
   final ExplorerPlayer white;
   final int year;
@@ -14,7 +13,6 @@ class ExplorerGame {
     required this.id,
     required this.winner,
     required this.speed,
-    required this.mode,
     required this.black,
     required this.white,
     required this.year,

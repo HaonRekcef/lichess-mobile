@@ -119,26 +119,28 @@ class _Body extends StatelessWidget {
               rootNavigator: true,
             ),
           ),
+          if (Theme.of(context).platform == TargetPlatform.android)
+            const SizedBox(height: 16.0),
+          PlatformListTile(
+            leading: Icon(
+              Icons.explore,
+              size: 32,
+              color: context.lichessColors.fancy,
+            ),
+            title: Padding(
+              padding: tilePadding,
+              child: Text(context.l10n.openingExplorer, style: Styles.callout),
+            ),
+            trailing: Theme.of(context).platform == TargetPlatform.iOS
+                ? const CupertinoListTileChevron()
+                : null,
+            onTap: () => pushPlatformRoute(
+              context,
+              builder: (context) => ExplorerScreen(),
+              rootNavigator: true,
+            ),
+          ),
         ],
-      ),
-      Padding(
-        padding: Styles.bodySectionBottomPadding,
-        child: CardButton(
-          icon: Icon(
-            Icons.explore,
-            size: 44,
-            color: context.lichessColors.primary,
-          ),
-          title: Text(
-            context.l10n.openingExplorer,
-            style: Styles.callout,
-          ),
-          onTap: () => pushPlatformRoute(
-            context,
-            builder: (context) => ExplorerScreen(),
-            rootNavigator: true,
-          ),
-        ),
       ),
     ];
 

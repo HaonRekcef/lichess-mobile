@@ -46,7 +46,7 @@ ExplorerResponse _decodeExplorerResponse(Map<String, dynamic> json) {
     black: pick(json['black']).asIntOrThrow(),
     moves: IList(pick(json['moves']).asListOrThrow(_moveFromPick)),
     topGames: IList(pick(json['topGames']).asListOrThrow(_gameFromPick)),
-    recentGames: IList(pick(json['recentGames']).asListOrThrow(_gameFromPick)),
+    recentGames: IList(pick(json['recentGames']).asListOrNull(_gameFromPick)),
     opening: opening,
   );
 }
@@ -67,8 +67,7 @@ ExplorerGame _gameFromPick(Pick pick) {
     uci: pick('uci').asStringOrThrow(),
     id: pick('id').asStringOrThrow(),
     winner: pick('winner').asStringOrNull(),
-    speed: pick('speed').asStringOrThrow(),
-    mode: pick('mode').asStringOrThrow(),
+    speed: pick('speed').asStringOrNull(),
     black: _playerFromPick(pick('black').required()),
     white: _playerFromPick(pick('white').required()),
     year: pick('year').asIntOrThrow(),

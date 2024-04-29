@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_game_speed.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_preferences.dart';
+import 'package:lichess_mobile/src/model/settings/general_preferences.dart';
 import 'package:lichess_mobile/src/styles/styles.dart';
 import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/widgets/list.dart';
@@ -12,7 +13,9 @@ class ExplorerSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prefs = ref.watch(explorerPreferencesProvider);
+    final isSoundEnabled = ref.watch(
+      generalPreferencesProvider.select((pref) => pref.isSoundEnabled),
+    );
     return DraggableScrollableSheet(
       initialChildSize: .7,
       expand: false,
@@ -33,6 +36,15 @@ class ExplorerSettingsScreen extends ConsumerWidget {
           PlatformListTile(
             title: Text(context.l10n.averageElo),
             subtitle: RatingSelection(),
+          ),
+          SwitchSettingTile(
+            title: Text(context.l10n.sound),
+            value: isSoundEnabled,
+            onChanged: (value) {
+              ref
+                  .read(generalPreferencesProvider.notifier)
+                  .toggleSoundEnabled();
+            },
           ),
         ],
       ),
@@ -88,7 +100,9 @@ class RatingSelection extends ConsumerWidget {
           child: Text(
             rating.toString(),
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         );
@@ -134,7 +148,9 @@ class SpeedSelection extends ConsumerWidget {
           },
           child: Icon(
             gameSpeedIcons[speed],
-            color: Theme.of(context).colorScheme.onSurface,
+            color: isSelected
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         );
       }).toList(),

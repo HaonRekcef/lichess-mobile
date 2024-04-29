@@ -10,6 +10,7 @@ import 'package:lichess_mobile/src/constants.dart';
 import 'package:lichess_mobile/src/model/common/id.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_controller.dart';
 import 'package:lichess_mobile/src/model/explorer/explorer_game.dart';
+import 'package:lichess_mobile/src/model/explorer/explorer_game_speed.dart';
 import 'package:lichess_mobile/src/model/game/game_repository_providers.dart';
 import 'package:lichess_mobile/src/model/settings/board_preferences.dart';
 import 'package:lichess_mobile/src/styles/lichess_colors.dart';
@@ -224,10 +225,13 @@ class ExplorerScreen extends ConsumerWidget {
                       if (state.explorerResponse!.topGames.isNotEmpty)
                         ColoredBox(
                           color: color,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              context.l10n.topGames,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                context.l10n.topGames,
+                              ),
                             ),
                           ),
                         ),
@@ -238,17 +242,21 @@ class ExplorerScreen extends ConsumerWidget {
                       if (state.explorerResponse!.recentGames.isNotEmpty)
                         ColoredBox(
                           color: color,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              context.l10n.recentGames,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                context.l10n.recentGames,
+                              ),
                             ),
                           ),
                         ),
-                      GameList(
-                        ref: ref,
-                        gameslist: state.explorerResponse?.recentGames,
-                      ),
+                      if (state.explorerResponse!.recentGames.isNotEmpty)
+                        GameList(
+                          ref: ref,
+                          gameslist: state.explorerResponse?.recentGames,
+                        ),
                     ],
                   ),
                 ),
@@ -284,6 +292,12 @@ class GameList extends StatelessWidget {
         (index) {
           final game = gameslist?[index];
           final GameId id = GameId(game!.id);
+          final gameSpeed = game.speed != null
+              ? GameSpeed.values.firstWhere(
+                  (e) => e.name == game.speed,
+                  orElse: () => GameSpeed.classical,
+                )
+              : GameSpeed.classical;
 
           return Material(
             child: InkWell(
@@ -311,12 +325,15 @@ class GameList extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${game.white.rating}   ${game.white.name}'),
-                        Text('${game.black.rating}   ${game.black.name}'),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${game.white.rating}   ${game.white.name}'),
+                          Text('${game.black.rating}   ${game.black.name}'),
+                        ],
+                      ),
                     ),
                     const Spacer(),
                     ClipRRect(
@@ -353,6 +370,9 @@ class GameList extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(game.month),
+                    const SizedBox(width: 10),
+                    Icon(gameSpeedIcons[gameSpeed]),
+                    const SizedBox(width: 5),
                   ],
                 ),
               ),
