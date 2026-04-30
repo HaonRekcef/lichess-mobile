@@ -47,7 +47,7 @@ class _Body extends ConsumerWidget {
           _Leaderboard(data.ultrabullet, LichessIcons.ultrabullet, 'ULTRA BULLET'),
           _Leaderboard(data.crazyhouse, LichessIcons.h_square, 'CRAZYHOUSE'),
           _Leaderboard(data.chess960, LichessIcons.die_six, 'CHESS 960'),
-          _Leaderboard(data.kingOfThehill, LichessIcons.bullet, 'KING OF THE HILL'),
+          _Leaderboard(data.kingOfThehill, LichessIcons.flag, 'KING OF THE HILL'),
           _Leaderboard(data.threeCheck, LichessIcons.three_check, 'THREE CHECK'),
           _Leaderboard(data.atomic, LichessIcons.atom, 'ATOMIC'),
           _Leaderboard(data.horde, LichessIcons.horde, 'HORDE'),
